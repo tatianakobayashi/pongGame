@@ -7,8 +7,7 @@ public class Ball : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Vector2 randomDirection = new Vector2(Random.value, Random.value);
-        // OBS: Força está variando
+        Vector2 randomDirection = new Vector2(Random.value, Random.value).normalized;
         GetComponent<Rigidbody2D>().AddForce(randomDirection * - 600f);
     }
 
