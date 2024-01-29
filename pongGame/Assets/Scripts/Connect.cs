@@ -3,13 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
+using TMPro;
 
 public class Connect : MonoBehaviourPunCallbacks
 {
+    public TMP_InputField playerName;
+    public GameObject loginPanel, findMatchPanel;
+
     // Start is called before the first frame update
     void Start()
     {
-        Login():
+        // Login();
+        loginPanel.SetActive(true);
     }
 
     // Update is called once per frame
@@ -23,7 +28,14 @@ public class Connect : MonoBehaviourPunCallbacks
     {
         PhotonNetwork.ConnectUsingSettings();
         PhotonNetwork.ConnectToRegion("sa");
-        PhotonNetwork.NickName = "player";
+
+        if(playerName.text != null)
+            PhotonNetwork.NickName = playerName.text;
+        else
+            PhotonNetwork.NickName = "player" + Random.Range(0, 1000);
+
+        Debug.Log("Player: " + PhotonNetwork.NickName);
+        loginPanel.SetActive(false);
     }
 
     public void ButtonFindMatch()
@@ -52,7 +64,7 @@ public class Connect : MonoBehaviourPunCallbacks
     {
         Debug.Log("Connected on Master");
 
-        ButtonFindMatch();
+        //ButtonFindMatch();
        
     }
 
