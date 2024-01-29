@@ -7,14 +7,21 @@ using TMPro;
 
 public class Connect : MonoBehaviourPunCallbacks
 {
-    public TMP_InputField playerName;
-    public GameObject loginPanel, findMatchPanel;
+    private TMP_InputField playerName, roomNameInput;
+    private TMP_Text roomFoundText;
+    public GameObject loginPanel, findMatchPanel, roomFoundPanel;
 
     // Start is called before the first frame update
     void Start()
     {
         // Login();
         loginPanel.SetActive(true);
+        findMatchPanel.SetActive(false);
+        roomFoundPanel.SetActive(false);
+
+        playerName = loginPanel.GetComponentInChildren<TMP_InputField>();
+        roomNameInput = findMatchPanel.GetComponentInChildren<TMP_InputField>();
+        roomFoundText = roomFoundPanel.GetComponentInChildren <TMP_Text>();
     }
 
     // Update is called once per frame
@@ -29,10 +36,8 @@ public class Connect : MonoBehaviourPunCallbacks
         PhotonNetwork.ConnectUsingSettings();
         PhotonNetwork.ConnectToRegion("sa");
 
-        if(playerName.text != null)
-            PhotonNetwork.NickName = playerName.text;
-        else
-            PhotonNetwork.NickName = "player" + Random.Range(0, 1000);
+
+        PhotonNetwork.NickName = (playerName.text != null && playerName.text.Length > 0) ? playerName.text : "player" + Random.Range(0, 1000);
 
         Debug.Log("Player: " + PhotonNetwork.NickName);
         loginPanel.SetActive(false);
@@ -46,10 +51,11 @@ public class Connect : MonoBehaviourPunCallbacks
 
     public void ButtonCreateRoom()
     {
-        string roomName = "temporary name";
+        string roomName = (roomNameInput != null && roomNameInput.text.Length > 0) ? roomNameInput.text : "room" + Random.Range(0, 1000);
         RoomOptions roomOptions = new RoomOptions() { MaxPlayers = 4};
 
         PhotonNetwork.JoinOrCreateRoom(roomName, roomOptions, TypedLobby.Default);
+        findMatchPanel.SetActive(false);
     }
 
     // -----------------------------------------------------
@@ -65,7 +71,8 @@ public class Connect : MonoBehaviourPunCallbacks
         Debug.Log("Connected on Master");
 
         //ButtonFindMatch();
-       
+
+        findMatchPanel.SetActive(true);
     }
 
     public override void OnJoinedLobby()
@@ -84,8 +91,11 @@ public class Connect : MonoBehaviourPunCallbacks
 
     public override void OnJoinedRoom()
     {
+        roomFoundPanel.SetActive(true);
         Debug.Log("Joined Room");
         Debug.Log("Room name: " + PhotonNetwork.CurrentRoom.Name);
         Debug.Log("Player count: " + PhotonNetwork.CurrentRoom.PlayerCount);
+
+        roomFoundText.text = "Room name: " + PhotonNetwork.CurrentRoom.Name + "\nPlayer count: " + PhotonNetwork.CurrentRoom.PlayerCount;
     }
 }
