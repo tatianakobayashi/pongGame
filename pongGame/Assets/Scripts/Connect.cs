@@ -11,6 +11,10 @@ public class Connect : MonoBehaviourPunCallbacks
     private TMP_Text roomFoundText;
     public GameObject loginPanel, findMatchPanel, roomFoundPanel;
 
+    public Transform[] startingPositions;
+
+    private string[] playerTypes = { "paddleBottom", "paddleTop", "paddleRight", "paddleLeft" };
+
     // Start is called before the first frame update
     void Start()
     {
@@ -91,11 +95,31 @@ public class Connect : MonoBehaviourPunCallbacks
 
     public override void OnJoinedRoom()
     {
-        roomFoundPanel.SetActive(true);
+        //roomFoundPanel.SetActive(true);
         Debug.Log("Joined Room");
         Debug.Log("Room name: " + PhotonNetwork.CurrentRoom.Name);
         Debug.Log("Player count: " + PhotonNetwork.CurrentRoom.PlayerCount);
 
-        roomFoundText.text = "Room name: " + PhotonNetwork.CurrentRoom.Name + "\nPlayer count: " + PhotonNetwork.CurrentRoom.PlayerCount;
+        roomFoundText.text = "Room name: " + PhotonNetwork.CurrentRoom.Name + "\nPlayer count: " + PhotonNetwork.CurrentRoom.PlayerCount +
+            "\nPlayer: " + PhotonNetwork.LocalPlayer.ActorNumber + "\nPaddle: " + playerTypes[PhotonNetwork.LocalPlayer.ActorNumber - 1];
+
+        // Instancia o fundo e as paredes
+        if (PhotonNetwork.LocalPlayer.ActorNumber - 1 == 0)
+        {
+            PhotonNetwork.Instantiate("Background", new Vector3(0, 0, 0), Quaternion.identity);
+            PhotonNetwork.Instantiate("walls", new Vector3(0, -4.8f, 0), Quaternion.identity);
+        }
+
+        PhotonNetwork.Instantiate(
+            playerTypes[PhotonNetwork.LocalPlayer.ActorNumber + 1] + " Variant", 
+            startingPositions[PhotonNetwork.LocalPlayer.ActorNumber + 1].position, 
+            (startingPositions[PhotonNetwork.LocalPlayer.ActorNumber + 1].position.x == 0) ? Quaternion.identity : Quaternion.Euler(0, 0, 90)
+            );
+
+        // Instancia a bola quando a sala tiver 4 jogadores
+        if (PhotonNetwork.LocalPlayer.ActorNumber - 1 == 3)
+        {
+            PhotonNetwork.Instantiate("Ball", new Vector3(0, 0, 0), Quaternion.identity);
+        }
     }
 }
