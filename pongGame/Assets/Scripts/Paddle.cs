@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
 public class Paddle : MonoBehaviour
 {
@@ -19,6 +20,7 @@ public class Paddle : MonoBehaviour
         followBall = false;
 
         horizontal = gameObject.transform.position.x == 0;
+        Debug.Log(horizontal);
     }
 
     // Update is called once per frame
@@ -44,5 +46,11 @@ public class Paddle : MonoBehaviour
     private void getBall()
     {
         ball = GameObject.FindGameObjectWithTag("Ball");
+    }
+
+    [PunRPC]
+    public void Lost()
+    {
+        followBall = true;
     }
 }
