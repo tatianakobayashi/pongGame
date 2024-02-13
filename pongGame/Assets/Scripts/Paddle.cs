@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 
-public class Paddle : MonoBehaviour
+public class Paddle : MonoBehaviourPunCallbacks
 {
     [SerializeField]
     private bool followBall;
@@ -12,21 +12,33 @@ public class Paddle : MonoBehaviour
 
     private bool horizontal;
 
+    private Vector3 mouse;
+
+    private bool ongoing, fullRoom;
+
+    private Rigidbody2D rb;
+
+    private GameObject gameController;
+
     // TODO - controles
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         followBall = false;
+        ongoing = false;
 
         horizontal = gameObject.transform.position.x == 0;
         Debug.Log(horizontal);
+
+        gameController = GameObject.FindGameObjectWithTag("GameController");
+        rb = gameObject.GetComponent<Rigidbody2D>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (followBall)
+        if (followBall) // Segue a bola
         {
             if (ball != null)
             {
@@ -41,6 +53,30 @@ public class Paddle : MonoBehaviour
             }
 
         }
+        else if (photonView.IsMine && ongoing)
+        {
+            // Movimentação seguindo a posição do mouse
+            Vector3 direction;
+            mouse = Camera.main.ScreenToWorldPoint( Input.mousePosition);
+            if (horizontal)
+                direction = new Vector3(mouse.x, 0);
+            else
+                direction = new Vector3(0, mouse.y);
+
+            Debug.Log("Mouse: " + mouse + " direction: " + direction);
+
+            rb.AddForce(direction.normalized * 2f);
+        } 
+        else if (gameController != null && photonView.IsMine && photonView.AmOwner && fullRoom)
+        {
+            // Inícia o jogo se a sala estiver cheia e for o dono da sala
+            if (Input.GetKeyDown(KeyCode.Space))
+                gameController.GetComponent<PhotonView>().RPC("StartGame", RpcTarget.All);
+        }
+        else if (gameController == null)
+        {
+            getGameController();
+        }
     }
 
     private void getBall()
@@ -48,9 +84,26 @@ public class Paddle : MonoBehaviour
         ball = GameObject.FindGameObjectWithTag("Ball");
     }
 
+    private void getGameController()
+    {
+        gameController = GameObject.FindGameObjectWithTag("GameController");
+    }
+
     [PunRPC]
     public void Lost()
     {
         followBall = true;
+    }
+
+    [PunRPC]
+    public void StartGame()
+    {
+        ongoing = true;
+    }
+
+    [PunRPC]
+    public void FullRoom()
+    {
+        fullRoom = true;
     }
 }

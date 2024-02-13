@@ -110,16 +110,18 @@ public class Connect : MonoBehaviourPunCallbacks
             PhotonNetwork.Instantiate("walls", new Vector3(0, -4.8f, 0), Quaternion.identity);
         }
 
+        int pos = PhotonNetwork.LocalPlayer.ActorNumber - 1;
+
         PhotonNetwork.Instantiate(
-            playerTypes[PhotonNetwork.LocalPlayer.ActorNumber + 1] + " Variant", 
-            startingPositions[PhotonNetwork.LocalPlayer.ActorNumber + 1].position, 
-            (startingPositions[PhotonNetwork.LocalPlayer.ActorNumber + 1].position.x == 0) ? Quaternion.identity : Quaternion.Euler(0, 0, 90)
+            playerTypes[pos] + " Variant", // Nome do prefab
+            startingPositions[pos].position,  // posição
+            (startingPositions[pos].position.x == 0) ? Quaternion.identity : Quaternion.Euler(0, 0, 90) // rotação
             );
 
-        // Instancia a bola quando a sala tiver 4 jogadores
-        if (PhotonNetwork.LocalPlayer.ActorNumber - 1 == 3)
+        // Instancia o game controller quando a sala tiver 4 jogadores
+        if (PhotonNetwork.LocalPlayer.ActorNumber == 4)
         {
-            PhotonNetwork.Instantiate("Ball", new Vector3(0, 0, 0), Quaternion.identity);
+            PhotonNetwork.Instantiate("GameController", new Vector3(0, 0, 0), Quaternion.identity);
         }
     }
 }
