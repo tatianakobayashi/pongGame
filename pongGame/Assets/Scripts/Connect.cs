@@ -119,7 +119,7 @@ public class Connect : MonoBehaviourPunCallbacks
             );
 
         // Instancia o game controller quando a sala tiver 4 jogadores
-        if (PhotonNetwork.LocalPlayer.ActorNumber == 4)
+        if (PhotonNetwork.LocalPlayer.ActorNumber == 1)
         {
             PhotonNetwork.Instantiate("GameController", new Vector3(0, 0, 0), Quaternion.identity);
         }

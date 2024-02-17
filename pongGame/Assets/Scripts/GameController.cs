@@ -10,7 +10,7 @@ public class GameController : MonoBehaviour
     private bool ongoing;
     private PhotonView photonView;
 
-    private GameObject ball;
+    private GameObject ball, wall;
 
     private GameObject[] players;
 
@@ -21,6 +21,9 @@ public class GameController : MonoBehaviour
 
         // busca objetos dos jogadores
         players = GameObject.FindGameObjectsWithTag("Player");
+
+        // Busca objeto das paredes
+        wall = GameObject.FindGameObjectWithTag("Walls");
 
         // Instancia bola
         ball = PhotonNetwork.Instantiate("Ball", new Vector3(0, 0, 0), Quaternion.identity);
@@ -49,6 +52,12 @@ public class GameController : MonoBehaviour
         }
 
         ball.GetComponent<PhotonView>().RPC("StartGame", RpcTarget.All);
+    }
+
+    [PunRPC]
+    public void HitWall(GameObject collision)
+    {
+        // TODO
     }
 
         /*

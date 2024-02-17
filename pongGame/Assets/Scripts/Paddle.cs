@@ -63,7 +63,7 @@ public class Paddle : MonoBehaviourPunCallbacks
             else
                 direction = new Vector3(0, mouse.y);
 
-            Debug.Log("Mouse: " + mouse + " direction: " + direction);
+            //Debug.Log("Mouse: " + mouse + " direction: " + direction);
 
             rb.AddForce(direction.normalized * 2f);
         } 

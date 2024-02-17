@@ -7,11 +7,13 @@ public class Ball : MonoBehaviour
 {
     private Rigidbody2D rb;
 
+    private GameObject gameController;
 
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        gameController = GameObject.FindGameObjectWithTag("GameController");
     }
 
     // Update is called once per frame
@@ -37,7 +39,12 @@ public class Ball : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.tag == "Wall") Debug.Log("hit wall");
+        if (collision.gameObject.tag == "Wall")
+        {
+            Debug.Log("hit wall");
+            Debug.Log(collision.gameObject.name);
+            gameController.GetComponent<PhotonView>().RPC("HitWall", RpcTarget.All, collision.gameObject);
+        }
         // TODO - fim de jogo
     }
 }
