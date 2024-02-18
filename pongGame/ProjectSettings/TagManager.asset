@@ -8,6 +8,8 @@ TagManager:
   - Wall
   - Bullet
   - Walls
+  - UI
+  - GameOver
   layers:
   - Default
   - TransparentFX

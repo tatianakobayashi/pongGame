@@ -35,8 +35,23 @@ public class Paddle : MonoBehaviourPunCallbacks
         rb = gameObject.GetComponent<Rigidbody2D>();
     }
 
+    private void Update()
+    {
+        if (gameController != null && photonView.IsMine && photonView.AmOwner && fullRoom)
+        {
+            // Inícia o jogo se a sala estiver cheia e for o dono da sala
+            if (Input.GetKeyDown(KeyCode.Space))
+                gameController.GetComponent<PhotonView>().RPC("StartGame", RpcTarget.All);
+        }
+        else if (gameController == null)
+        {
+            getGameController();
+        }
+
+    }
+
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         if (followBall) // Segue a bola
         {
@@ -65,18 +80,8 @@ public class Paddle : MonoBehaviourPunCallbacks
 
             //Debug.Log("Mouse: " + mouse + " direction: " + direction);
 
-            rb.AddForce(direction.normalized * 2f);
+            rb.AddForce(direction.normalized * 20f);
         } 
-        else if (gameController != null && photonView.IsMine && photonView.AmOwner && fullRoom)
-        {
-            // Inícia o jogo se a sala estiver cheia e for o dono da sala
-            if (Input.GetKeyDown(KeyCode.Space))
-                gameController.GetComponent<PhotonView>().RPC("StartGame", RpcTarget.All);
-        }
-        else if (gameController == null)
-        {
-            getGameController();
-        }
     }
 
     private void getBall()
@@ -92,6 +97,12 @@ public class Paddle : MonoBehaviourPunCallbacks
     [PunRPC]
     public void Lost()
     {
+        StartCoroutine(WaitBallMove());
+    }
+
+    IEnumerator WaitBallMove()
+    {
+        yield return new WaitForSeconds(1);
         followBall = true;
     }
 

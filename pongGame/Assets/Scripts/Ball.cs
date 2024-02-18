@@ -9,17 +9,26 @@ public class Ball : MonoBehaviour
 
     private GameObject gameController;
 
+
+    private float maxVelocity = 50f, sqrMaxVelocity;
+
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        sqrMaxVelocity = maxVelocity * maxVelocity;
         gameController = GameObject.FindGameObjectWithTag("GameController");
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
-        
+        var v = rb.velocity;
+
+        if (v.sqrMagnitude > sqrMaxVelocity)
+        { 
+            rb.velocity = v.normalized * maxVelocity;
+        }
     }
 
     [PunRPC]
@@ -27,7 +36,7 @@ public class Ball : MonoBehaviour
     {
         Vector2 randomDirection = new Vector2(Random.value, Random.value).normalized;
         Debug.Log("random direction: " + randomDirection);
-        rb.AddForce(randomDirection * -600f);
+        rb.AddForce(randomDirection * -200f);
     }
 
     [PunRPC]
@@ -41,9 +50,9 @@ public class Ball : MonoBehaviour
     {
         if (collision.gameObject.tag == "Wall")
         {
-            Debug.Log("hit wall");
-            Debug.Log(collision.gameObject.name);
-            gameController.GetComponent<PhotonView>().RPC("HitWall", RpcTarget.All, collision.gameObject);
+            //Debug.Log("hit wall");
+            //Debug.Log(collision.gameObject.name);
+            gameController.GetComponent<PhotonView>().RPC("HitWall", RpcTarget.All, collision.gameObject.name);
         }
         // TODO - fim de jogo
     }

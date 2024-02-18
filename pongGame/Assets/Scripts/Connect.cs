@@ -9,11 +9,13 @@ public class Connect : MonoBehaviourPunCallbacks
 {
     private TMP_InputField playerName, roomNameInput;
     private TMP_Text roomFoundText;
-    public GameObject loginPanel, findMatchPanel, roomFoundPanel;
+    public GameObject loginPanel, findMatchPanel, roomFoundPanel, gameStatusPanel, gameOverPanel;
 
     public Transform[] startingPositions;
 
     private string[] playerTypes = { "paddleBottom", "paddleTop", "paddleRight", "paddleLeft" };
+
+    public TMP_Text[] playerNames;
 
     // Start is called before the first frame update
     void Start()
@@ -26,6 +28,8 @@ public class Connect : MonoBehaviourPunCallbacks
         playerName = loginPanel.GetComponentInChildren<TMP_InputField>();
         roomNameInput = findMatchPanel.GetComponentInChildren<TMP_InputField>();
         roomFoundText = roomFoundPanel.GetComponentInChildren <TMP_Text>();
+
+        ClearNames();
     }
 
     // Update is called once per frame
@@ -60,6 +64,25 @@ public class Connect : MonoBehaviourPunCallbacks
 
         PhotonNetwork.JoinOrCreateRoom(roomName, roomOptions, TypedLobby.Default);
         findMatchPanel.SetActive(false);
+    }
+
+    public void ButtonExitMatch()
+    {
+        gameOverPanel.SetActive(false);
+        PhotonNetwork.LeaveRoom();
+        ClearNames();
+        findMatchPanel.SetActive(true);
+    }
+
+    private void ClearNames()
+    {
+        foreach(TMP_Text t in playerNames)
+            t.text = "";
+    }
+
+    public void doExitGame()
+    {
+        Application.Quit();
     }
 
     // -----------------------------------------------------
@@ -104,13 +127,15 @@ public class Connect : MonoBehaviourPunCallbacks
             "\nPlayer: " + PhotonNetwork.LocalPlayer.ActorNumber + "\nPaddle: " + playerTypes[PhotonNetwork.LocalPlayer.ActorNumber - 1];
 
         // Instancia o fundo e as paredes
-        if (PhotonNetwork.LocalPlayer.ActorNumber - 1 == 0)
+        if (PhotonNetwork.LocalPlayer.ActorNumber == 1)
         {
             PhotonNetwork.Instantiate("Background", new Vector3(0, 0, 0), Quaternion.identity);
             PhotonNetwork.Instantiate("walls", new Vector3(0, -4.8f, 0), Quaternion.identity);
         }
 
         int pos = PhotonNetwork.LocalPlayer.ActorNumber - 1;
+
+        playerNames[pos].text = PhotonNetwork.LocalPlayer.NickName;
 
         PhotonNetwork.Instantiate(
             playerTypes[pos] + " Variant", // Nome do prefab
@@ -121,6 +146,7 @@ public class Connect : MonoBehaviourPunCallbacks
         // Instancia o game controller quando a sala tiver 4 jogadores
         if (PhotonNetwork.LocalPlayer.ActorNumber == 1)
         {
+            PhotonNetwork.Instantiate("Ball", new Vector3(0, 0, 0), Quaternion.identity);
             PhotonNetwork.Instantiate("GameController", new Vector3(0, 0, 0), Quaternion.identity);
         }
     }
