@@ -17,14 +17,19 @@ public class GameController : MonoBehaviour
 
     private Dictionary<string, int> positions = new Dictionary<string, int>();
 
-    private int activePlayers;
+    private Dictionary<int, string> playersById;
+
+    private int activePlayers, winner;
 
     private List<string> names;
 
+    private Connect connect;
+
     // Start is called before the first frame update
-    void Awake()
+    void Start()
     {
         names = new List<string>();
+        playersById = new Dictionary<int, string>();
 
         positions.Add("bottom", 1);
         positions.Add("top", 2);
@@ -36,8 +41,9 @@ public class GameController : MonoBehaviour
         // busca objetos dos jogadores
         players = GameObject.FindGameObjectsWithTag("Player");
 
-        // Busca objeto das paredes
-        gameOverPanel = GameObject.FindGameObjectWithTag("GameOver");
+        GetGameOverPanel();
+
+        connect = GameObject.FindGameObjectWithTag("Connect").GetComponent<Connect>();
 
         // Instancia bola
         ball = GameObject.FindGameObjectWithTag("Ball");
@@ -60,20 +66,36 @@ public class GameController : MonoBehaviour
     [PunRPC]
     public void StartGame()
     {
+        Debug.Log("StartGame");
+
         activePlayers = 4;
+        /*
         if (gameOverPanel != null)
-            gameOverPanel.active = false;
+            gameOverPanel.SetActive(false);
+        else
+            GetGameOverPanel();
+        */
+        connect.StartGame();
 
         // envia sinal de início de jogo
         foreach (GameObject player in players)
         {
-            player.GetComponent<PhotonView>().RPC("StartGame", RpcTarget.All);
+            //names.Add(player.name);
 
-            names.Add(player.name);
+            Debug.Log("Nome objeto: " + player.name + " nickname: " + player.GetComponent<PhotonView>().name);
+
+            player.GetComponent<PhotonView>().RPC("StartGame", RpcTarget.All);
+        }
+
+        foreach (Player p in PhotonNetwork.PlayerList)
+        {
+            names.Add(p.NickName);
+            playersById.Add(p.ActorNumber, p.NickName);
         }
 
         ball.GetComponent<PhotonView>().RPC("StartGame", RpcTarget.All);
     }
+
 
     [PunRPC]
     public void HitWall(string wallName)
@@ -90,12 +112,16 @@ public class GameController : MonoBehaviour
 
                 if (playerPhoton.CreatorActorNr == position)
                 {
-                    Debug.Log(player.name);
                     activePlayers--;
-                    names.Remove(player.name);
+                    string loser;
+                    playersById.TryGetValue(playerPhoton.CreatorActorNr, out loser);
+                    names.Remove(loser);
                     playerPhoton.RPC("Lost", RpcTarget.All);
                     if (activePlayers == 1)
+                    {
                         photonView.RPC("GameOver", RpcTarget.All);
+                    }
+
                 }
             }
         }
@@ -104,8 +130,19 @@ public class GameController : MonoBehaviour
     [PunRPC]
     private void GameOver()
     {
-        gameOverPanel.active = true;
-        gameOverPanel.GetComponentInChildren<TMP_Text>().text = "Vencedor: " + names[0];
+        /*
+        if (gameOverPanel != null)
+        {
+            gameOverPanel.SetActive(true);
+            gameOverPanel.GetComponentInChildren<TMP_Text>().text = "Vencedor: " + names[0];
+        }
+        else
+        {
+            GetGameOverPanel();
+        }
+        */
+
+        connect.GameOver(names[0]);
 
         names.Remove(names[0]);
 
@@ -116,6 +153,12 @@ public class GameController : MonoBehaviour
         }
 
         ball.GetComponent<PhotonView>().RPC("GameOver", RpcTarget.All);
+    }
+
+    private void GetGameOverPanel()
+    {
+        // Busca objeto das paredes
+        gameOverPanel = GameObject.FindGameObjectWithTag("GameOver");
     }
 
     /*

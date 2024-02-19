@@ -10,6 +10,7 @@ TagManager:
   - Walls
   - UI
   - GameOver
+  - Connect
   layers:
   - Default
   - TransparentFX

@@ -53,8 +53,8 @@ public class Connect : MonoBehaviourPunCallbacks
 
     public void ButtonFindMatch()
     {
-
         PhotonNetwork.JoinLobby();
+        findMatchPanel.SetActive(false);
     }
 
     public void ButtonCreateRoom()
@@ -144,10 +144,21 @@ public class Connect : MonoBehaviourPunCallbacks
             );
 
         // Instancia o game controller quando a sala tiver 4 jogadores
-        if (PhotonNetwork.LocalPlayer.ActorNumber == 1)
+        if (PhotonNetwork.LocalPlayer.ActorNumber == 4)
         {
             PhotonNetwork.Instantiate("Ball", new Vector3(0, 0, 0), Quaternion.identity);
             PhotonNetwork.Instantiate("GameController", new Vector3(0, 0, 0), Quaternion.identity);
         }
+    }
+
+    public void StartGame()
+    {
+        gameOverPanel.SetActive(false);
+    }
+
+    public void GameOver(string winner)
+    {
+        gameOverPanel.SetActive(true);
+        gameOverPanel.GetComponentInChildren<TMP_Text>().text = "Vencedor: " + winner;
     }
 }

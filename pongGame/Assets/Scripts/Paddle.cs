@@ -80,7 +80,7 @@ public class Paddle : MonoBehaviourPunCallbacks
 
             //Debug.Log("Mouse: " + mouse + " direction: " + direction);
 
-            rb.AddForce(direction.normalized * 20f);
+            rb.AddForce(direction.normalized * 40f);
         } 
     }
 
@@ -102,7 +102,7 @@ public class Paddle : MonoBehaviourPunCallbacks
 
     IEnumerator WaitBallMove()
     {
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(0.5f);
         followBall = true;
     }
 

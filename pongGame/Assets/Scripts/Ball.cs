@@ -36,7 +36,7 @@ public class Ball : MonoBehaviour
     {
         Vector2 randomDirection = new Vector2(Random.value, Random.value).normalized;
         Debug.Log("random direction: " + randomDirection);
-        rb.AddForce(randomDirection * -200f);
+        rb.AddForce(randomDirection * -100f);
     }
 
     [PunRPC]
