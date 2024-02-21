@@ -46,6 +46,13 @@ public class Ball : MonoBehaviour
         gameObject.transform.position = new Vector3(0, 0, 0);
     }
 
+    [PunRPC]
+    public void GameOver()
+    {
+        rb.AddForce(new Vector2(0, 0));
+        gameObject.transform.position = new Vector3(0, 0, 0);
+    }
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.tag == "Wall")

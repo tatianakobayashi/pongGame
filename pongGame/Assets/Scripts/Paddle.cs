@@ -117,4 +117,11 @@ public class Paddle : MonoBehaviourPunCallbacks
     {
         fullRoom = true;
     }
+
+    [PunRPC]
+    public void GameOver()
+    {
+        ongoing = false;
+        rb.AddForce(new Vector2(0, 0));
+    }
 }
